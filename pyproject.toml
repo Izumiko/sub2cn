@@ -1,0 +1,17 @@
+[project]
+name = "sub2cn"
+version = "0.1.0"
+description = "Automated MKV subtitle extraction and AI translation tool"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pysubs2",
+    "openai",
+]
+
+[project.scripts]
+sub2cn = "sub2cn:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
