@@ -9,10 +9,10 @@ import argparse
 
 # ================= 配置区域 =================
 # 优先读取系统环境变量中的 OPENAI_API_KEY，如果没有则使用备用字符串（请替换为你自己的 API Key）
-API_KEY = os.getenv("OPENAI_API_KEY", "sk-apikey")
-BASE_URL = "https://api.deepseek.com"
-MODEL_NAME = "deepseek-chat"
-BATCH_SIZE = 30 
+API_KEY = os.getenv("SUB2CN_API_KEY", "sk-apikey")
+BASE_URL = os.getenv("SUB2CN_BASE_URL", "https://api.deepseek.com")
+MODEL_NAME = os.getenv("SUB2CN_MODEL_NAME", "deepseek-v4-flash")
+BATCH_SIZE = int(os.getenv("SUB2CN_BATCH_SIZE", "30"))
 # ============================================
 
 client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
