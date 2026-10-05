@@ -11,7 +11,7 @@ import argparse
 # 优先读取系统环境变量中的 OPENAI_API_KEY，如果没有则使用备用字符串（请替换为你自己的 API Key）
 API_KEY = os.getenv("SUB2CN_API_KEY", "sk-apikey")
 BASE_URL = os.getenv("SUB2CN_BASE_URL", "https://api.deepseek.com")
-MODEL_NAME = os.getenv("SUB2CN_MODEL_NAME", "deepseek-v4-flash")
+MODEL_NAME = os.getenv("SUB2CN_MODEL_NAME", "deepseek-flash")
 BATCH_SIZE = int(os.getenv("SUB2CN_BATCH_SIZE", "30"))
 # ============================================
 
@@ -36,6 +36,17 @@ def get_eng_track_id(mkv_file):
 def extract_ass(mkv_file, track_id, output_ass):
     print(f"正在提取英文轨道 {track_id} 到 {output_ass}...")
     subprocess.run(['mkvextract', 'tracks', mkv_file, f"{track_id}:{output_ass}"], check=True)
+
+def match_file_owner(source_file, target_file):
+    if os.geteuid() != 0:
+        return
+
+    try:
+        source_stat = os.stat(source_file)
+        os.chown(target_file, source_stat.st_uid, source_stat.st_gid)
+        print(f"已将字幕文件所有权设置为与输入 MKV 一致：{source_stat.st_uid}:{source_stat.st_gid}")
+    except OSError as e:
+        print(f"警告: 无法设置字幕文件所有权: {e}")
 
 def translate_batch(batch_texts):
     input_text = "\n".join([f"{i}|{text}" for i, text in enumerate(batch_texts)])
@@ -131,6 +142,7 @@ def main():
         print(f"发现已提取的英文字幕 {eng_ass}，直接进入翻译阶段。")
 
     make_bilingual_ass(eng_ass, bilingual_ass)
+    match_file_owner(mkv_file, bilingual_ass)
     
     # 清理临时提取的纯英文字幕文件（可选，如果想保留可以注释掉这一行）
     if os.path.exists(eng_ass):
